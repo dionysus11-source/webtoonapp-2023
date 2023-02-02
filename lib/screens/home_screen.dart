@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:webtoon_app_2023/models/webtoon_model.dart';
 import 'package:webtoon_app_2023/services/api_service.dart';
+import 'package:webtoon_app_2023/widgets/webtoon_widget.dart';
 
 class HomeScreen extends StatelessWidget {
   HomeScreen({super.key});
+
   final Future<List<WebtoonModel>> webtoons = ApiServce.getTodaysToons();
 
   @override
@@ -27,16 +29,13 @@ class HomeScreen extends StatelessWidget {
         future: webtoons,
         builder: (context, snapshot) {
           if (snapshot.hasData) {
-            return ListView.separated(
-              separatorBuilder: (context, index) => const SizedBox(
-                width: 20,
-              ),
-              itemBuilder: (context, index) {
-                var webtoon = snapshot.data![index];
-                return Text(webtoon.title);
-              },
-              scrollDirection: Axis.horizontal,
-              itemCount: snapshot.data!.length,
+            return Column(
+              children: [
+                const SizedBox(
+                  height: 20,
+                ),
+                Expanded(child: makeList(snapshot)),
+              ],
             );
           } else {
             return const Center(
@@ -46,5 +45,23 @@ class HomeScreen extends StatelessWidget {
         },
       ),
     );
+  }
+
+  ListView makeList(AsyncSnapshot<List<WebtoonModel>> snapshot) {
+    return ListView.separated(
+        padding: const EdgeInsets.symmetric(vertical: 10, horizontal: 15),
+        scrollDirection: Axis.horizontal,
+        itemBuilder: ((context, index) {
+          var webtoon = snapshot.data![index];
+          return Webtoon(
+            title: webtoon.title,
+            thumb: webtoon.thumb,
+            id: webtoon.id,
+          );
+        }),
+        separatorBuilder: ((context, index) => const SizedBox(
+              width: 40,
+            )),
+        itemCount: snapshot.data!.length);
   }
 }

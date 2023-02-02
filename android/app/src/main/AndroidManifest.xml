@@ -1,5 +1,17 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.example.webtoon_app_2023">
+    <queries>
+  <!-- If your app checks for SMS support -->
+  <intent>
+    <action android:name="android.intent.action.VIEW" />
+    <data android:scheme="sms" />
+  </intent>
+  <!-- If your app checks for call support -->
+  <intent>
+    <action android:name="android.intent.action.VIEW" />
+    <data android:scheme="tel" />
+  </intent>
+</queries>
    <application
         android:label="webtoon_app_2023"
         android:name="${applicationName}"
@@ -32,3 +44,4 @@
             android:value="2" />
     </application>
 </manifest>
+<!-- Provide required visibility configuration for API level 30 and above -->
