@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:webtoon_app_2023/models/webtoon_detail_model.dart';
 import 'package:webtoon_app_2023/models/webtoon_episode_model.dart';
 import 'package:webtoon_app_2023/services/api_service.dart';
@@ -21,11 +22,44 @@ class DetailScreen extends StatefulWidget {
 class _DetailScreenState extends State<DetailScreen> {
   late Future<WebtoonDetailModel> webtoon;
   late Future<List<WebtoonEpisodeModel>> webtoon_episodes;
+  late SharedPreferences prefs;
+  bool isLiked = false;
+
+  Future initPrefs() async {
+    prefs = await SharedPreferences.getInstance();
+    final likedToons = prefs.getStringList('likedToons');
+    if (likedToons == null) {
+      await prefs.setStringList('likedToons', []);
+    } else {
+      if (likedToons.contains(widget.id)) {
+        setState(() {
+          isLiked = true;
+        });
+      }
+    }
+  }
+
   @override
   void initState() {
     super.initState();
     webtoon = ApiServce.getToonById(widget.id);
     webtoon_episodes = ApiServce.getLatestEpisodeById(widget.id);
+    initPrefs();
+  }
+
+  void onHeartTap() async {
+    final likedToons = prefs.getStringList('likedToons');
+    if (likedToons != null) {
+      if (isLiked) {
+        likedToons.remove(widget.id);
+      } else {
+        likedToons.add(widget.id);
+      }
+      await prefs.setStringList('likedToons', likedToons);
+      setState(() {
+        isLiked = !isLiked;
+      });
+    }
   }
 
   @override
@@ -36,6 +70,13 @@ class _DetailScreenState extends State<DetailScreen> {
         elevation: 2,
         backgroundColor: Colors.white,
         foregroundColor: Colors.green,
+        actions: [
+          IconButton(
+              onPressed: onHeartTap,
+              icon: isLiked
+                  ? const Icon(Icons.favorite)
+                  : const Icon(Icons.favorite_outline_rounded)),
+        ],
         title: Text(
           widget.title,
           style: const TextStyle(
