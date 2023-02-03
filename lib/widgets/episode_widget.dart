@@ -14,9 +14,10 @@ class Episode extends StatelessWidget {
 
   Future<void> onButtonTap() async {
     String url =
-        '"https://comic.naver.com/webtoon/detail?titleId=$webtoonId&no=${episode.id}"';
+        'https://comic.naver.com/webtoon/detail?titleId=$webtoonId&no=${episode.id}';
     if (!await launchUrlString(
       url,
+      mode: LaunchMode.externalApplication,
     )) {
       throw Exception('Could not launch');
     }
